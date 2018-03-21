@@ -12,7 +12,7 @@ Using RNN, LSTM automatically generates Chinese poetry texts.
 
 ### sample poetry
 ```
-python generate.py --mode sample
+python sample.py
 ```
 
 ```
@@ -34,21 +34,20 @@ python generate.py --mode sample
 ```
 藏头诗生成效果：
 
-to do
+To do
+```
+
+```
+根据上句诗完成下句诗：
+
+To do
 ```
 
 ### train 
  
  ```
-    python generate.py --mode train
+    python train.py
  ```
-
-### continue train
-
- ```
-    python generate.py --mode con-train
- ```
-
  
 ### Poetry
 Data：https://github.com/chinese-poetry/chinese-poetry
