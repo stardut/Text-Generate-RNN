@@ -27,12 +27,13 @@ class Net(object):
             embedding = tf.get_variable("embedding", [self.data.words_size, self.num_units])
             inputs = tf.nn.embedding_lookup(embedding, self.inputs)
 
-        cell = tf.nn.rnn_cell.MultiRNNCell([self.unit() for _ in range(self.num_layer)])
-        init_state = cell.zero_state(self.batch_size, dtype=tf.float32)
-        output, state = tf.nn.dynamic_rnn(cell,
-                                        inputs=inputs,
-                                        sequence_length=self.seq_len,
-                                        initial_state=init_state)
+        self.cell = tf.nn.rnn_cell.MultiRNNCell([self.unit() for _ in range(self.num_layer)])
+        self.init_state = self.cell.zero_state(self.batch_size, dtype=tf.float32)
+        output, self.final_state = tf.nn.dynamic_rnn(self.cell,
+                                                inputs=inputs,
+                                                sequence_length=self.seq_len,
+                                                initial_state=self.init_state,
+                                                scope='rnn')
 
         y = tf.reshape(output, [-1, self.num_units])
         logits = tf.matmul(y, w) + b

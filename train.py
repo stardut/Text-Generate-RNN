@@ -10,7 +10,7 @@ from net import Net
 from data import Data
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-# os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 num_units = 512
 num_layer = 2
