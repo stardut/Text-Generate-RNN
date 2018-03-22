@@ -16,7 +16,7 @@ num_units = 512
 num_layer = 2
 batch_size = 128
 num_step = 100 * 10000
-learning_rate = 0.01
+learning_rate = 0.001
 
 with open('setting.ini', 'a') as f:
     time_ = time.strftime("%Y-%m-%d %H:%M:%S  ", time.localtime())
@@ -68,4 +68,4 @@ with tf.Session() as sess:
             print('save model in step: %d' % (step))
 
         if step % 2000 == 0:
-            learning_rate = max(learning_rate*0.98, 0.00001)
+            learning_rate = max(learning_rate*0.95, 0.000001)

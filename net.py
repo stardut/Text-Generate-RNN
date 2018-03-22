@@ -38,6 +38,7 @@ class Net(object):
         y = tf.reshape(output, [-1, self.num_units])
         logits = tf.matmul(y, w) + b
         prob = tf.nn.softmax(logits)
+        self.prob = tf.reshape(prob, [self.batch_size, -1])
         pre = tf.argmax(prob, 1)
         self.pre = tf.reshape(pre, [self.batch_size, -1])
 
