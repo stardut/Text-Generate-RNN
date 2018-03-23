@@ -56,7 +56,7 @@ with tf.Session() as sess:
             predict = ''.join(list(map(data.id2char, pre[0][:seq_len[0]])))            
             print('step: %d, loss: %.4f, lr: %.6f' % (step, loss, learning_rate))
             print('original: %s' % (original))
-            print('predict: %s' % (predict))
+            print('predict: %s\n' % (predict))
             with open('train_step.txt', 'a') as f:
                 time_ = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
                 text = '%s, loss: %.4f, step: %d\n%s\n\n' % (time_, loss, step, predict)

@@ -11,9 +11,10 @@ MAX_LENGTH = 280
 MIN_LENGTH = 10
 
 
+
 class Data:
     def __init__(self, data_dir, input_file, vocab_file, 
-            tensor_file, seq_len=300, batch_size = 64):
+            tensor_file, is_train=True, seq_len=300, batch_size = 64):
         global MAX_LENGTH
         MAX_LENGTH = seq_len
         self.batch_size = batch_size
@@ -27,8 +28,10 @@ class Data:
             self.preprocess(input_file, vocab_file, tensor_file)
         else:
             print("loading preprocessed files")
-            self.load_preprocessed(vocab_file, tensor_file)      
-        self.create_batches()
+            self.load_vocab(vocab_file)
+            if is_train:
+                self.load_tensor(tensor_file)
+                self.create_batches()
         print('load data done')
         # print(self.words_size)
 
@@ -38,17 +41,20 @@ class Data:
     def char2id(self, word):
         return self.vocab[word]
 
-    def load_preprocessed(self, vocab_file, tensor_file):
+    def load_tensor(self, tensor_file):
+        print('reading: ' + tensor_file)
+        self.texts_vector = np.load(tensor_file)
+        print('poetries number: %d' % (self.texts_vector.shape[0]))
+
+    def load_vocab(self, vocab_file):
         print('reading: ' + vocab_file)
         with open(vocab_file, 'rb') as f:
             self.chars = cPickle.load(f)
         self.vocab_size = len(self.chars)
         self.vocab = {v : i for i, v in enumerate(self.chars)}
         self.vocab_id = dict(enumerate(self.chars))
-        print('reading: ' + tensor_file)
-        self.texts_vector = np.load(tensor_file)
-        print(self.texts_vector.shape)
         self.words_size = len(self.chars)
+        print('words size: %d' % (self.words_size))
         self.words = self.chars
 
     def preprocess(self, input_file, vocab_file, tensor_file):
