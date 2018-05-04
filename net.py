@@ -34,25 +34,33 @@ class Net(object):
                                                 sequence_length=self.seq_len,
                                                 initial_state=self.init_state,
                                                 scope='rnn')
+        with tf.name_scope('fc'):
+            y = tf.reshape(output, [-1, self.num_units])
+            logits = tf.matmul(y, w) + b
 
-        y = tf.reshape(output, [-1, self.num_units])
-        logits = tf.matmul(y, w) + b
-        prob = tf.nn.softmax(logits)
+        with tf.name_scope('softmax'):
+            prob = tf.nn.softmax(logits)
+
         self.prob = tf.reshape(prob, [self.batch_size, -1])
         pre = tf.argmax(prob, 1)
         self.pre = tf.reshape(pre, [self.batch_size, -1])
 
         targets = tf.reshape(self.targets, [-1])
-        loss = seq2seq.sequence_loss_by_example([logits],
+        with tf.name_scope('loss'):
+            loss = seq2seq.sequence_loss_by_example([logits],
                                                 [targets],
                                                 [tf.ones_like(targets, dtype=tf.float32)])
+            self.loss = tf.reduce_mean(loss)
 
-        self.loss = tf.reduce_mean(loss)
-        optimizer = tf.train.AdamOptimizer(self.learning_rate)
+        with tf.name_scope('summary'):
+            tf.summary.scalar('loss', self.loss)
+            self.merged_summary = tf.summary.merge_all()
 
-        tvars = tf.trainable_variables()
-        grads, _ = tf.clip_by_global_norm(tf.gradients(self.loss, tvars), 5)
-        self.train_op = optimizer.apply_gradients(zip(grads, tvars))
+        with tf.name_scope('optimizer'):
+            optimizer = tf.train.AdamOptimizer(self.learning_rate)
+            tvars = tf.trainable_variables()
+            grads, _ = tf.clip_by_global_norm(tf.gradients(self.loss, tvars), 5)
+            self.train_op = optimizer.apply_gradients(zip(grads, tvars))
 
 
     def unit(self):

@@ -9,12 +9,12 @@ import numpy as np
 from net import Net
 from data import Data
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-num_units = 512
+num_units = 128
 num_layer = 2
-batch_size = 128
+batch_size = 16
 num_step = 100 * 10000
 learning_rate = 0.001
 
@@ -25,7 +25,7 @@ with open('setting.ini', 'a') as f:
     f.write(time_ + s)
 
 data_dir = 'data/'
-input_file = 'poetry.txt'
+input_file = 'tang'
 vocab_file = 'vocab.pkl'
 tensor_file = 'tensor.npy'
 
@@ -33,10 +33,19 @@ model_dir = 'model'
 if not os.path.exists(model_dir):
     os.mkdir(model_dir)
 
-data = Data(data_dir, input_file, vocab_file, tensor_file, batch_size=batch_size)
+summary_dir = 'summary'
+if not os.path.exists(summary_dir):
+    os.mkdir(summary_dir)
+
+summary_name = str(int(time.time()))
+summary_savepath = os.path.join(summary_dir, summary_name)
+os.mkdir(summary_savepath)
+
+data = Data(data_dir, input_file, vocab_file, tensor_file, batch_size)
 model = Net(data, num_units, num_layer, batch_size)
 
 with tf.Session() as sess:
+    writer = tf.summary.FileWriter(summary_savepath, sess.graph)
     tf.global_variables_initializer().run()
     saver = tf.train.Saver(tf.global_variables(), max_to_keep=5)    
 
@@ -49,7 +58,9 @@ with tf.Session() as sess:
             model.learning_rate: learning_rate,
             model.keep_prob: 0.5
         }
-        pre, loss, _ = sess.run([model.pre, model.loss, model.train_op], feed_dict=feed)
+        fetches = [model.pre, model.loss, model.merged_summary, model.train_op]
+        pre, loss, summary, _ = sess.run(fetches, feed_dict=feed)
+        writer.add_summary(summary, step)
 
         if step % 100 == 0:
             original = ''.join(list(map(data.id2char, inputs[0][:seq_len[0]])))

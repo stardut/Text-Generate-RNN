@@ -11,10 +11,9 @@ MAX_LENGTH = 280
 MIN_LENGTH = 10
 
 
-
 class Data:
     def __init__(self, data_dir, input_file, vocab_file, 
-            tensor_file, is_train=True, seq_len=300, batch_size = 64):
+            tensor_file, batch_size=64, is_train=True, seq_len=280):
         global MAX_LENGTH
         MAX_LENGTH = seq_len
         self.batch_size = batch_size
@@ -26,6 +25,7 @@ class Data:
 
         if not (os.path.exists(vocab_file) and os.path.exists(tensor_file)):
             self.preprocess(input_file, vocab_file, tensor_file)
+            self.create_batches()
         else:
             print("loading preprocessed files")
             self.load_vocab(vocab_file)
